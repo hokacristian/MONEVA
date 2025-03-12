@@ -5,9 +5,11 @@ const tambahFormInput = async (req, res) => {
   try {
     const { 
       lokasi, lat, long, jmlhBantuan, jenisBantuan, jmlhKK, 
-      jmlhMasyarakat, jmlhPerempuan, jmlhLaki, debitAir, 
-      pemakaianAir, sanitasi
+      jmlhPerempuan, jmlhLaki, debitAir, pemakaianAir, sanitasi
     } = req.body;
+
+    // Hitung jumlah masyarakat secara otomatis dari jumlah perempuan dan laki-laki
+    const jmlhMasyarakat = parseInt(jmlhPerempuan) + parseInt(jmlhLaki);
 
     let imgUrl = null;
 
@@ -17,7 +19,6 @@ const tambahFormInput = async (req, res) => {
         file: req.file.buffer, // Gambar dari multer
         fileName: `form_${Date.now()}.jpg`,
       });
-
       imgUrl = uploadImage.url; // URL dari ImageKit
     }
 
@@ -31,9 +32,9 @@ const tambahFormInput = async (req, res) => {
         jmlhBantuan: parseInt(jmlhBantuan),
         jenisBantuan,
         jmlhKK: parseInt(jmlhKK),
-        jmlhMasyarakat: parseInt(jmlhMasyarakat),
         jmlhPerempuan: parseInt(jmlhPerempuan),
         jmlhLaki: parseInt(jmlhLaki),
+        jmlhMasyarakat, // Nilai otomatis
         debitAir,
         pemakaianAir,
         sanitasi,
@@ -44,7 +45,6 @@ const tambahFormInput = async (req, res) => {
       message: "Form input berhasil disimpan",
       data: newFormInput
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
