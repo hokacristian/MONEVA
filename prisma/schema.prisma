@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"  
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -8,13 +8,14 @@ generator client {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  name    String   
-  password String
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  name      String
+  password  String
   role      Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  formInput FormInput[]
 }
 
 model Place {
@@ -23,11 +24,11 @@ model Place {
 }
 
 model FormInput {
-  id              Int     @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   lokasi         String
   lat            Float
   long           Float
-  img            String? 
+  img            String?
   jmlhBantuan    Int
   jenisBantuan   String
   jmlhKK         Int
@@ -39,52 +40,52 @@ model FormInput {
   sanitasi       String
   createdAt      DateTime @default(now())
 
-  outcome        Outcome? @relation("FormInputToOutcome") // Relasi tanpa `fields` dan `references`
-  dampak         Dampak? @relation("FormInputToDampak")
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  outcome Outcome? @relation("FormInputToOutcome") // Relasi tanpa `fields` dan `references`
+  dampak  Dampak?  @relation("FormInputToDampak")
 }
 
 model Outcome {
-  id                             Int      @id @default(autoincrement())
-  formInputId                    Int      @unique
-  konsumsiAirPerTahun            Float
-  kualitasAir                    String
+  id                              Int      @id @default(autoincrement())
+  formInputId                     Int      @unique
+  konsumsiAirPerTahun             Float
+  kualitasAir                     String
   rataRataTerpaparPenyakitSebelum Int
   rataRataTerpaparPenyakitSesudah Int
-  awarenessMasyarakat            String
+  awarenessMasyarakat             String
   penilaianSaranaAirBersih        String
   penilaianSanitasi               String
   deskripsiAwareness              String
-  createdAt                      DateTime @default(now())
+  createdAt                       DateTime @default(now())
 
-  formInput                      FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
+  formInput FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
 }
 
 model Dampak {
-  id                                  Int     @id @default(autoincrement())
-  formInputId                         Int     @unique
-  biayaBerobatSebelum                 Float
-  biayaBerobatSesudah                 Float
-  biayaAirBersihSebelum               Float
-  biayaAirBersihSesudah               Float
-  peningkatanEkonomiSebelum            Float
-  peningkatanEkonomiSesudah            Float
-  penurunanOrangSakitSebelum           Int
-  penurunanOrangSakitSesudah           Int
-  penurunanStuntingSebelum             Int
-  penurunanStuntingSesudah             Int
-  peningkatanIndeksKesehatanSebelum    Float
-  peningkatanIndeksKesehatanSesudah    Float
-  volumeLimbahDikelola                 Float
-  prosesKonservasiAir                  Boolean
-  penurunanIndexPencemaranSebelum      Float
-  penurunanIndexPencemaranSesudah      Float
-  createdAt                            DateTime @default(now())
+  id                                Int      @id @default(autoincrement())
+  formInputId                       Int      @unique
+  biayaBerobatSebelum               Float
+  biayaBerobatSesudah               Float
+  biayaAirBersihSebelum             Float
+  biayaAirBersihSesudah             Float
+  peningkatanEkonomiSebelum         Float
+  peningkatanEkonomiSesudah         Float
+  penurunanOrangSakitSebelum        Int
+  penurunanOrangSakitSesudah        Int
+  penurunanStuntingSebelum          Int
+  penurunanStuntingSesudah          Int
+  peningkatanIndeksKesehatanSebelum Float
+  peningkatanIndeksKesehatanSesudah Float
+  volumeLimbahDikelola              Float
+  prosesKonservasiAir               Boolean
+  penurunanIndexPencemaranSebelum   Float
+  penurunanIndexPencemaranSesudah   Float
+  createdAt                         DateTime @default(now())
 
-  formInput                      FormInput @relation("FormInputToDampak", fields: [formInputId], references: [id])
+  formInput FormInput @relation("FormInputToDampak", fields: [formInputId], references: [id])
 }
-
-
-
 
 enum Role {
   ADMIN

@@ -1,4 +1,6 @@
 const express = require("express");
+const { authMiddleware } = require('../middlewares/authMiddleware');
+
 const upload = require("../middlewares/uploadMiddleware");
 const {
   tambahFormInput,
@@ -17,7 +19,7 @@ const {
 
 const router = express.Router();
 
-router.post("/input", upload.single("img"), tambahFormInput);
+router.post("/input", authMiddleware, upload.single("img"), tambahFormInput);
 router.post("/outcome/:id", tambahOutcome);
 router.post("/dampak/:id", tambahDampak);
 
