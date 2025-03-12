@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"  
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name    String   
+  password String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Place {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
+
+model FormInput {
+  id              Int     @id @default(autoincrement())
+  lokasi         String
+  lat            Float
+  long           Float
+  img            String? 
+  jmlhBantuan    Int
+  jenisBantuan   String
+  jmlhKK         Int
+  jmlhMasyarakat Int
+  jmlhPerempuan  Int
+  jmlhLaki       Int
+  debitAir       String
+  pemakaianAir   String
+  sanitasi       String
+  createdAt      DateTime @default(now())
+}
+
+
+
+enum Role {
+  ADMIN
+  PETUGAS
+}
