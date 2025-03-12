@@ -51,6 +51,51 @@ const tambahFormInput = async (req, res) => {
   }
 };
 
+const tambahOutcome = async (req, res) => {
+  try {
+    const { 
+      formInputId, 
+      konsumsiAirPerTahun, 
+      kualitasAir, 
+      rataRataTerpaparPenyakitSebelum, 
+      rataRataTerpaparPenyakitSesudah, 
+      awarenessMasyarakat,
+      penilaianSaranaAirBersih,
+      penilaianSanitasi
+    } = req.body;
+
+    // Validasi apakah formInputId ada di database
+    const formInput = await prisma.formInput.findUnique({
+      where: { id: parseInt(formInputId) }
+    });
+    if (!formInput) {
+      return res.status(404).json({ message: "Form input tidak ditemukan" });
+    }
+
+    // Simpan data ke database
+    const newOutcome = await prisma.outcome.create({
+      data: {
+        formInputId: parseInt(formInputId),
+        konsumsiAirPerTahun: parseFloat(konsumsiAirPerTahun),
+        kualitasAir,
+        rataRataTerpaparPenyakitSebelum: parseInt(rataRataTerpaparPenyakitSebelum),
+        rataRataTerpaparPenyakitSesudah: parseInt(rataRataTerpaparPenyakitSesudah),
+        awarenessMasyarakat,
+        penilaianSaranaAirBersih,
+        penilaianSanitasi
+      },
+    });
+
+    res.status(201).json({
+      message: "Outcome berhasil disimpan",
+      data: newOutcome
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
+  }
+};
+
 module.exports = {
-  tambahFormInput
+  tambahFormInput,tambahOutcome
 };

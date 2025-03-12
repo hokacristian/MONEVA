@@ -38,7 +38,26 @@ model FormInput {
   pemakaianAir   String
   sanitasi       String
   createdAt      DateTime @default(now())
+
+  outcome        Outcome? @relation("FormInputToOutcome") // Relasi tanpa `fields` dan `references`
 }
+
+model Outcome {
+  id                             Int      @id @default(autoincrement())
+  formInputId                    Int      @unique
+  konsumsiAirPerTahun            Float
+  kualitasAir                    String
+  rataRataTerpaparPenyakitSebelum Int
+  rataRataTerpaparPenyakitSesudah Int
+  awarenessMasyarakat            String
+  penilaianSaranaAirBersih        String
+  penilaianSanitasi               String
+  createdAt                      DateTime @default(now())
+
+  formInput                      FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
+}
+
+
 
 
 
