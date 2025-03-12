@@ -40,6 +40,7 @@ model FormInput {
   createdAt      DateTime @default(now())
 
   outcome        Outcome? @relation("FormInputToOutcome") // Relasi tanpa `fields` dan `references`
+  dampak         Dampak? @relation("FormInputToDampak")
 }
 
 model Outcome {
@@ -52,11 +53,35 @@ model Outcome {
   awarenessMasyarakat            String
   penilaianSaranaAirBersih        String
   penilaianSanitasi               String
+  deskripsiAwareness              String
   createdAt                      DateTime @default(now())
 
   formInput                      FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
 }
 
+model Dampak {
+  id                                  Int     @id @default(autoincrement())
+  formInputId                         Int     @unique
+  biayaBerobatSebelum                 Float
+  biayaBerobatSesudah                 Float
+  biayaAirBersihSebelum               Float
+  biayaAirBersihSesudah               Float
+  peningkatanEkonomiSebelum            Float
+  peningkatanEkonomiSesudah            Float
+  penurunanOrangSakitSebelum           Int
+  penurunanOrangSakitSesudah           Int
+  penurunanStuntingSebelum             Int
+  penurunanStuntingSesudah             Int
+  peningkatanIndeksKesehatanSebelum    Float
+  peningkatanIndeksKesehatanSesudah    Float
+  volumeLimbahDikelola                 Float
+  prosesKonservasiAir                  Boolean
+  penurunanIndexPencemaranSebelum      Float
+  penurunanIndexPencemaranSesudah      Float
+  createdAt                            DateTime @default(now())
+
+  formInput                      FormInput @relation("FormInputToDampak", fields: [formInputId], references: [id])
+}
 
 
 
