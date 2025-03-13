@@ -38,12 +38,14 @@ model FormInput {
   debitAir       String
   pemakaianAir   String
   sanitasi       String
-  createdAt      DateTime @default(now())
+  sumberAir      String    
+  hargaAir       Float     
+  createdAt      DateTime  @default(now())
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
-  outcome Outcome? @relation("FormInputToOutcome") // Relasi tanpa `fields` dan `references`
+  outcome Outcome? @relation("FormInputToOutcome")
   dampak  Dampak?  @relation("FormInputToDampak")
 }
 
@@ -54,9 +56,14 @@ model Outcome {
   kualitasAir                     String
   rataRataTerpaparPenyakitSebelum Int
   rataRataTerpaparPenyakitSesudah Int
+  awarenessMasyarakat             String
   penilaianSaranaAirBersih        String
   penilaianSanitasi               String
   deskripsiAwareness              String
+  bisaDipakaiMCK                  Boolean // Baru
+  bisaDiminum                     Boolean // Baru
+  ecoKeberlanjutan                Boolean // Baru
+  levelSaranaAirBersih            Int     // Baru: Nilai level otomatis
   createdAt                       DateTime @default(now())
 
   formInput FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
@@ -81,6 +88,10 @@ model Dampak {
   prosesKonservasiAir               Boolean
   penurunanIndexPencemaranSebelum   Float
   penurunanIndexPencemaranSesudah   Float
+  sumberAirSebelum                  String  // Baru
+  sumberAirSesudah                  String  // Baru
+  biayaListrikSebelum               Float   // Baru
+  biayaListrikSesudah               Float   // Baru
   createdAt                         DateTime @default(now())
 
   formInput FormInput @relation("FormInputToDampak", fields: [formInputId], references: [id])

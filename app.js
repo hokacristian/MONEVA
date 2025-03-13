@@ -1,22 +1,33 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const formRoutes = require("./routes/formRoutes");
 const authRoutes = require("./routes/authRoutes");
 const placeRoutes = require("./routes/placeRoutes");
 
-const path = require("path");
-
 const app = express();
+
+
+
 
 // Middleware untuk mengizinkan CORS dengan credentials (cookies)
 app.use(
   cors({
-    origin: "http://localhost:5173", // Sesuaikan dengan URL frontend Anda
-    credentials: true, // Izinkan cookies dikirim dalam request
+    origin: ["http://localhost:5173", "http://localhost:3000", "http://localhost:3001"], 
+    credentials: true, 
     methods: "GET,POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type,Authorization",
   })
 );
+
+// Gunakan express.json() hanya untuk non-multipart requests
+app.use((req, res, next) => {
+  if (req.headers["content-type"]?.startsWith("multipart/form-data")) {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 // Middleware untuk parsing JSON
 app.use(express.json());

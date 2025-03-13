@@ -1,3 +1,4 @@
+const { uploadImageToImageKit } = require("../configs/imagekit");
 const {
   tambahFormInputService,
   getAllFormInputsService,
@@ -14,26 +15,44 @@ const {
 } = require("../services/formService");
 
 const tambahFormInput = async (req, res) => {
+  console.log("📥 Request Body:", req.body);
+  console.log("📂 Uploaded File:", req.file);
+
   if (!req.user || !req.user.id) {
     return res.status(401).json({ message: "User not authenticated" });
   }
 
   try {
-    const userId = req.user.id; // Ambil userId dari payload token
-    const newFormInput = await tambahFormInputService(
-      req.body,
-      req.file,
-      userId
-    );
-    res
-      .status(201)
-      .json({ message: "Form input berhasil disimpan", data: newFormInput });
+    const userId = req.user.id;
+    let imgUrl = null;
+
+    // ✅ Upload gambar hanya jika ada file yang diunggah
+    if (req.file) {
+      try {
+        imgUrl = await uploadImageToImageKit(req.file);
+        console.log("✅ Final Image URL:", imgUrl);
+      } catch (error) {
+        console.error("❌ Upload ImageKit Error:", error.message);
+        return res.status(500).json({ message: "Gagal mengunggah gambar", error: error.message });
+      }
+    }
+
+    // ✅ Kirim `imgUrl` ke fungsi penyimpanan database
+    const newFormInput = await tambahFormInputService(req.body, imgUrl, userId);
+
+    res.status(201).json({
+      message: "✅ Form input berhasil disimpan",
+      data: newFormInput,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Terjadi kesalahan", error: error.message });
+    console.error("❌ Error:", error.message);
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
   }
 };
+
+
+
+
 
 const getAllFormInputs = async (req, res) => {
   try {
@@ -97,16 +116,16 @@ const tambahOutcome = async (req, res) => {
   try {
     const formInputId = parseInt(req.params.id);
     const newOutcome = await tambahOutcomeService(formInputId, req.body);
-    res
-      .status(201)
-      .json({ message: "Outcome berhasil disimpan", data: newOutcome });
+    res.status(201).json({
+      message: "Outcome berhasil disimpan",
+      data: newOutcome,
+    });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ message: "Terjadi kesalahan", error: error.message });
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
   }
 };
+
 
 const getAllOutcomes = async (req, res) => {
   try {

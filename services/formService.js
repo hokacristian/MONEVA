@@ -1,52 +1,30 @@
 const prisma = require("../configs/prisma");
-const imagekit = require("../configs/imagekit");
+const { uploadImageToImageKit } = require("../configs/imagekit");
 
-const tambahFormInputService = async (data, file, userId) => {
-  const {
-    lokasi,
-    lat,
-    long,
-    jmlhBantuan,
-    jenisBantuan,
-    jmlhKK,
-    jmlhPerempuan,
-    jmlhLaki,
-    debitAir,
-    pemakaianAir,
-    sanitasi,
-  } = data;
-
-  const jmlhMasyarakat = parseInt(jmlhPerempuan) + parseInt(jmlhLaki);
-
-  let imgUrl = null;
-
-  if (file) {
-    const uploadImage = await imagekit.upload({
-      file: file.buffer,
-      fileName: `form_${Date.now()}.jpg`,
-    });
-    imgUrl = uploadImage.url;
-  }
+// Di file service
+const tambahFormInputService = async (data, imgUrl, userId) => {
+  const jmlhMasyarakat = parseInt(data.jmlhPerempuan) + parseInt(data.jmlhLaki);
 
   const newFormInput = await prisma.formInput.create({
     data: {
-      lokasi,
-      lat: parseFloat(lat),
-      long: parseFloat(long),
-      img: imgUrl,
-      jmlhBantuan: parseInt(jmlhBantuan),
-      jenisBantuan,
-      jmlhKK: parseInt(jmlhKK),
-      jmlhPerempuan: parseInt(jmlhPerempuan),
-      jmlhLaki: parseInt(jmlhLaki),
+      lokasi: data.lokasi,
+      lat: parseFloat(data.lat),
+      long: parseFloat(data.long),
+      img: imgUrl || null, // Handle jika imgUrl undefined
+      jmlhBantuan: parseInt(data.jmlhBantuan),
+      jenisBantuan: data.jenisBantuan,
+      jmlhKK: parseInt(data.jmlhKK),
+      jmlhPerempuan: parseInt(data.jmlhPerempuan),
+      jmlhLaki: parseInt(data.jmlhLaki),
       jmlhMasyarakat,
-      debitAir,
-      pemakaianAir,
-      sanitasi,
-      userId, // Kirimkan userId sebagai integer yang benar, bukan objek
+      debitAir: data.debitAir,
+      pemakaianAir: data.pemakaianAir,
+      sanitasi: data.sanitasi,
+      sumberAir: data.sumberAir,
+      hargaAir: parseFloat(data.hargaAir),
+      userId,
     },
   });
-
   return newFormInput;
 };
 
@@ -60,7 +38,16 @@ const tambahOutcomeService = async (formInputId, data) => {
     deskripsiAwareness,
     penilaianSaranaAirBersih,
     penilaianSanitasi,
+    bisaDipakaiMCK,         // Baru
+    bisaDiminum,            // Baru
+    ecoKeberlanjutan,       // Baru
   } = data;
+
+  let levelSaranaAirBersih = 0;
+  if (bisaDipakaiMCK) levelSaranaAirBersih = 1;
+  if (bisaDiminum) levelSaranaAirBersih = 2;
+  if (ecoKeberlanjutan) levelSaranaAirBersih = 3;
+
 
   const formInput = await prisma.formInput.findUnique({
     where: { id: formInputId },
@@ -74,16 +61,16 @@ const tambahOutcomeService = async (formInputId, data) => {
       formInputId,
       konsumsiAirPerTahun: parseFloat(konsumsiAirPerTahun),
       kualitasAir,
-      rataRataTerpaparPenyakitSebelum: parseInt(
-        rataRataTerpaparPenyakitSebelum
-      ),
-      rataRataTerpaparPenyakitSesudah: parseInt(
-        rataRataTerpaparPenyakitSesudah
-      ),
+      rataRataTerpaparPenyakitSebelum: parseInt(rataRataTerpaparPenyakitSebelum),
+      rataRataTerpaparPenyakitSesudah: parseInt(rataRataTerpaparPenyakitSesudah),
       awarenessMasyarakat,
       deskripsiAwareness,
       penilaianSaranaAirBersih,
       penilaianSanitasi,
+      bisaDipakaiMCK,
+      bisaDiminum,
+      ecoKeberlanjutan,
+      levelSaranaAirBersih,
     },
   });
 
@@ -108,6 +95,10 @@ const tambahDampakService = async (formInputId, data) => {
     prosesKonservasiAir,
     penurunanIndexPencemaranSebelum,
     penurunanIndexPencemaranSesudah,
+    sumberAirSebelum,
+    sumberAirSesudah,
+    biayaListrikSebelum,
+    biayaListrikSesudah,
   } = data;
 
   // Validasi apakah formInputId ada
@@ -132,20 +123,16 @@ const tambahDampakService = async (formInputId, data) => {
       penurunanOrangSakitSesudah: parseInt(penurunanOrangSakitSesudah),
       penurunanStuntingSebelum: parseInt(penurunanStuntingSebelum),
       penurunanStuntingSesudah: parseInt(penurunanStuntingSesudah),
-      peningkatanIndeksKesehatanSebelum: parseFloat(
-        peningkatanIndeksKesehatanSebelum
-      ),
-      peningkatanIndeksKesehatanSesudah: parseFloat(
-        peningkatanIndeksKesehatanSesudah
-      ),
+      peningkatanIndeksKesehatanSebelum: parseFloat(peningkatanIndeksKesehatanSebelum),
+      peningkatanIndeksKesehatanSesudah: parseFloat(peningkatanIndeksKesehatanSesudah),
       volumeLimbahDikelola: parseFloat(volumeLimbahDikelola),
       prosesKonservasiAir: Boolean(prosesKonservasiAir),
-      penurunanIndexPencemaranSebelum: parseFloat(
-        penurunanIndexPencemaranSebelum
-      ),
-      penurunanIndexPencemaranSesudah: parseFloat(
-        penurunanIndexPencemaranSesudah
-      ),
+      penurunanIndexPencemaranSebelum: parseFloat(penurunanIndexPencemaranSebelum),
+      penurunanIndexPencemaranSesudah: parseFloat(penurunanIndexPencemaranSesudah),
+      sumberAirSebelum,
+      sumberAirSesudah,
+      biayaListrikSebelum: parseFloat(biayaListrikSebelum),
+      biayaListrikSesudah: parseFloat(biayaListrikSesudah),
     },
   });
 
@@ -184,40 +171,47 @@ const getFormInputByIdService = async (id) => {
 const updateFormInputService = async (id, data, file) => {
   let updatedData = { ...data };
 
-  // Jika ada file yang diunggah, upload ke ImageKit
-  if (file) {
-    const uploadImage = await imagekit.upload({
-      file: file.buffer,
-      fileName: `form_${Date.now()}.jpg`,
-    });
-    updatedData.img = uploadImage.url;
+  // ✅ Konversi hargaAir ke float jika ada
+  if (updatedData.hargaAir) {
+    updatedData.hargaAir = parseFloat(updatedData.hargaAir);
+    if (isNaN(updatedData.hargaAir)) {
+      throw new Error("hargaAir harus berupa angka valid");
+    }
   }
 
-  // Konversi nilai yang seharusnya numerik
-  if (updatedData.jmlhBantuan)
-    updatedData.jmlhBantuan = parseInt(updatedData.jmlhBantuan);
+  // ✅ Jika ada file, upload ke ImageKit
+  if (file) {
+    const uploadImage = await uploadImageToImageKit(file);
+    updatedData.img = uploadImage;
+  }
+
+  // ✅ Konversi angka lain ke format yang benar
+  if (updatedData.jmlhBantuan) updatedData.jmlhBantuan = parseInt(updatedData.jmlhBantuan);
   if (updatedData.jmlhKK) updatedData.jmlhKK = parseInt(updatedData.jmlhKK);
-  if (updatedData.jmlhPerempuan)
-    updatedData.jmlhPerempuan = parseInt(updatedData.jmlhPerempuan);
-  if (updatedData.jmlhLaki)
-    updatedData.jmlhLaki = parseInt(updatedData.jmlhLaki);
+  if (updatedData.jmlhPerempuan) updatedData.jmlhPerempuan = parseInt(updatedData.jmlhPerempuan);
+  if (updatedData.jmlhLaki) updatedData.jmlhLaki = parseInt(updatedData.jmlhLaki);
   if (updatedData.lat) updatedData.lat = parseFloat(updatedData.lat);
   if (updatedData.long) updatedData.long = parseFloat(updatedData.long);
 
-  // Hitung ulang jumlah masyarakat
-  if (
-    updatedData.jmlhPerempuan !== undefined &&
-    updatedData.jmlhLaki !== undefined
-  ) {
-    updatedData.jmlhMasyarakat =
-      updatedData.jmlhPerempuan + updatedData.jmlhLaki;
+  // ✅ Hitung ulang jumlah masyarakat
+  if (updatedData.jmlhPerempuan !== undefined && updatedData.jmlhLaki !== undefined) {
+    updatedData.jmlhMasyarakat = updatedData.jmlhPerempuan + updatedData.jmlhLaki;
   }
 
-  return await prisma.formInput.update({
-    where: { id },
-    data: updatedData,
-  });
+  try {
+    const updatedFormInput = await prisma.formInput.update({
+      where: { id: parseInt(id) },
+      data: updatedData,
+    });
+
+    console.log("✅ Form input berhasil diperbarui:", updatedFormInput);
+    return updatedFormInput;
+  } catch (error) {
+    console.error("❌ Gagal memperbarui ke database:", error.message);
+    throw new Error("Gagal memperbarui data: " + error.message);
+  }
 };
+
 
 // GET All Outcomes
 const getAllOutcomesService = async () => {
