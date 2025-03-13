@@ -259,6 +259,26 @@ const updateDampakService = async (id, data) => {
   });
 };
 
+// Menghitung total jumlah KK dari FormInput
+const getTotalKKService = async () => {
+  const totalKK = await prisma.formInput.aggregate({
+    _sum: {
+      jmlhKK: true, // Menghitung total seluruh KK
+    },
+  });
+  return totalKK._sum.jmlhKK || 0; // Jika tidak ada data, kembalikan 0
+};
+
+// Menghitung total jumlah Bantuan dari FormInput
+const getTotalBantuanService = async () => {
+  const totalBantuan = await prisma.formInput.aggregate({
+    _sum: {
+      jmlhBantuan: true, // Menghitung total seluruh Bantuan
+    },
+  });
+  return totalBantuan._sum.jmlhBantuan || 0; // Jika tidak ada data, kembalikan 0
+};
+
 module.exports = {
   tambahFormInputService,
   getAllFormInputsService,
@@ -272,4 +292,6 @@ module.exports = {
   updateOutcomeService,
   getOutcomeByIdService,
   getAllOutcomesService,
+  getTotalKKService,
+  getTotalBantuanService,
 };

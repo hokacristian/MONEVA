@@ -14,6 +14,7 @@ const {
   getAllFormInputs,
   getFormInputById,
   updateFormInput,
+  getTotalBantuan, getTotalKK
 } = require("../controllers/formController");
 
 const router = express.Router();
@@ -60,5 +61,11 @@ router.patch("/dampak/:id", updateDampak);
 router.get("/input", getAllFormInputs);
 router.get("/input/:id", getFormInputById);
 router.patch("/input/:id", upload.single("img"), updateFormInput);
+
+// Route untuk mendapatkan total KK
+router.get("/totalKK", getTotalKK); // ✅ Tambahkan endpoint baru
+
+// Route untuk mendapatkan total Bantuan
+router.get("/totalBantuan", getTotalBantuan); // ✅ Tambahkan endpoint baru
 
 module.exports = router;

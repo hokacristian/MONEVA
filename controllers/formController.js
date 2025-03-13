@@ -11,7 +11,8 @@ const {
   updateFormInputService,
   updateOutcomeService,
   getOutcomeByIdService,
-  getAllOutcomesService,
+  getAllOutcomesService,getTotalKKService, 
+  getTotalBantuanService 
 } = require("../services/formService");
 
 const tambahFormInput = async (req, res) => {
@@ -222,6 +223,26 @@ const updateDampak = async (req, res) => {
   }
 };
 
+// Mengambil total jumlah KK
+const getTotalKK = async (req, res) => {
+  try {
+    const totalKK = await getTotalKKService();
+    res.status(200).json({ totalKK });
+  } catch (error) {
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
+  }
+};
+
+// Mengambil total jumlah Bantuan
+const getTotalBantuan = async (req, res) => {
+  try {
+    const totalBantuan = await getTotalBantuanService();
+    res.status(200).json({ totalBantuan });
+  } catch (error) {
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
+  }
+};
+
 module.exports = {
   tambahFormInput,
   getAllFormInputs,
@@ -235,4 +256,6 @@ module.exports = {
   getAllDampak,
   getDampakById,
   updateDampak,
+  getTotalKK,
+  getTotalBantuan,
 };

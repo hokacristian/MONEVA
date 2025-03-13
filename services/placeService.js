@@ -19,8 +19,13 @@ const deletePlaceService = async (id) => {
   });
 };
 
+// Menghitung total tempat yang ada di database
+const getTotalPlacesService = async () => {
+  return await prisma.place.count(); // Menghitung jumlah semua tempat
+};
+
 module.exports = {
   tambahPlaceService,
   getAllPlacesService,
-  deletePlaceService,
+  deletePlaceService,getTotalPlacesService
 };

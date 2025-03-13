@@ -1,5 +1,5 @@
 // controllers/authController.js
-const { registerUser, findUserByEmail } = require("../services/authService");
+const { registerUser, findUserByEmail, findUserById  } = require("../services/authService");
 const { generateToken } = require("../configs/jwt");
 const bcrypt = require("bcryptjs");
 
@@ -81,8 +81,28 @@ const logout = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
+const whoami = async (req, res) => {
+  try {
+    // Ambil user ID dari `req.user` (sudah diverifikasi di middleware)
+    const user = await findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Kirim data user
+    res.status(200).json({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving user data", error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
+  whoami,
 };

@@ -1,7 +1,7 @@
 const {
     tambahPlaceService,
     getAllPlacesService,
-    deletePlaceService,
+    deletePlaceService,getTotalPlacesService
   } = require('../services/placeService');
   
   // Menambahkan tempat baru
@@ -43,10 +43,19 @@ const {
       res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
     }
   };
+
+  const getTotalPlaces = async (req, res) => {
+    try {
+      const total = await getTotalPlacesService();
+      res.status(200).json({ totalPlaces: total });
+    } catch (error) {
+      res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
+    }
+  };
   
   module.exports = {
     tambahPlace,
     getAllPlaces,
-    deletePlace,
+    deletePlace,getTotalPlaces,
   };
   
