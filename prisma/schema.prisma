@@ -54,7 +54,6 @@ model Outcome {
   kualitasAir                     String
   rataRataTerpaparPenyakitSebelum Int
   rataRataTerpaparPenyakitSesudah Int
-  awarenessMasyarakat             String
   penilaianSaranaAirBersih        String
   penilaianSanitasi               String
   deskripsiAwareness              String

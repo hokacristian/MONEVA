@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const formRoutes = require("./routes/formRoutes");
 const authRoutes = require("./routes/authRoutes");
+const placeRoutes = require("./routes/placeRoutes");
+
 const path = require("path");
 
 const app = express();
@@ -22,6 +24,8 @@ app.use(express.json());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/form", formRoutes);
+app.use("/", placeRoutes);
+
 
 // Static files (jika diperlukan)
 app.use("/public", express.static(path.join(__dirname, "../public")));
