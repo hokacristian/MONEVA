@@ -38,17 +38,50 @@ const tambahOutcomeService = async (formInputId, data) => {
     deskripsiAwareness,
     penilaianSaranaAirBersih,
     penilaianSanitasi,
-    bisaDipakaiMCK,         // Baru
-    bisaDiminum,            // Baru
-    ecoKeberlanjutan,       // Baru
+    bisaDipakaiMCK,
+    bisaDiminum,
+    ecoKeberlanjutan,
+
+    // Data tambahan untuk perhitungan level
+    airHanyaUntukMCK,
+    aksesTerbatas,
+    butuhUsahaJarak,
+    airTersediaSetiapSaat,
+    pengelolaanProfesional,
+    aksesMudah,
+    efisiensiAir,
+    ramahLingkungan,
+    keadilanAkses,
+    adaptabilitasSistem,
+
+    toiletBerfungsi,
+    aksesSanitasiMemadai,
+    eksposurLimbah,
+    limbahDikelolaAman,
+    adaSeptictank,
+    sanitasiBersih,
+    aksesKelompokRentan,
+    rasioMCKMemadai,
+    keberlanjutanEkosistem,
+    pemanfaatanAirEfisien
   } = data;
 
-  let levelSaranaAirBersih = 0;
-  if (bisaDipakaiMCK) levelSaranaAirBersih = 1;
-  if (bisaDiminum) levelSaranaAirBersih = 2;
-  if (ecoKeberlanjutan) levelSaranaAirBersih = 3;
+  // Menentukan levelSaranaAirBersih berdasarkan data
+  const levelSaranaAirBersih = tentukanLevelSaranaAirBersih({
+    airHanyaUntukMCK, aksesTerbatas, butuhUsahaJarak,
+    airTersediaSetiapSaat, bisaDiminum, pengelolaanProfesional,
+    aksesMudah, efisiensiAir, ramahLingkungan,
+    keadilanAkses, adaptabilitasSistem
+  });
 
+  // Menentukan levelSanitasi berdasarkan data
+  const levelSanitasi = tentukanLevelSanitasi({
+    toiletBerfungsi, aksesSanitasiMemadai, eksposurLimbah,
+    limbahDikelolaAman, adaSeptictank, sanitasiBersih,
+    aksesKelompokRentan, rasioMCKMemadai, keberlanjutanEkosistem, pemanfaatanAirEfisien
+  });
 
+  // Validasi apakah formInputId ada
   const formInput = await prisma.formInput.findUnique({
     where: { id: formInputId },
   });
@@ -56,6 +89,7 @@ const tambahOutcomeService = async (formInputId, data) => {
     throw new Error("Form input tidak ditemukan");
   }
 
+  // Simpan ke database
   const newOutcome = await prisma.outcome.create({
     data: {
       formInputId,
@@ -70,12 +104,67 @@ const tambahOutcomeService = async (formInputId, data) => {
       bisaDipakaiMCK,
       bisaDiminum,
       ecoKeberlanjutan,
-      levelSaranaAirBersih,
+      levelSaranaAirBersih, // Disimpan otomatis
+      levelSanitasi, // Disimpan otomatis
+
+      // Simpan semua data tambahan
+      airHanyaUntukMCK,
+      aksesTerbatas,
+      butuhUsahaJarak,
+      airTersediaSetiapSaat,
+      pengelolaanProfesional,
+      aksesMudah,
+      efisiensiAir,
+      ramahLingkungan,
+      keadilanAkses,
+      adaptabilitasSistem,
+      toiletBerfungsi,
+      aksesSanitasiMemadai,
+      eksposurLimbah,
+      limbahDikelolaAman,
+      adaSeptictank,
+      sanitasiBersih,
+      aksesKelompokRentan,
+      rasioMCKMemadai,
+      keberlanjutanEkosistem,
+      pemanfaatanAirEfisien
     },
   });
 
   return newOutcome;
 };
+
+
+// Fungsi untuk menentukan level sarana air bersih
+const tentukanLevelSaranaAirBersih = (data) => {
+  if (data.efisiensiAir || data.ramahLingkungan || data.keadilanAkses || data.adaptabilitasSistem) {
+    return 3; // Level 3 - Penyediaan Air Minum yang Dikelola dengan Aman dan Berkelanjutan
+  }
+  if (data.airTersediaSetiapSaat || data.bisaDiminum || data.pengelolaanProfesional || data.aksesMudah) {
+    return 2; // Level 2 - Penyediaan Air Minum yang Dikelola dengan Aman
+  }
+  if (data.airHanyaUntukMCK || data.aksesTerbatas || data.butuhUsahaJarak) {
+    return 1; // Level 1 - Sarana Air Bersih Dasar
+  }
+  return 0; // Tidak memenuhi syarat
+};
+
+
+// Fungsi untuk menentukan level sanitasi
+const tentukanLevelSanitasi = (data) => {
+  if (data.aksesKelompokRentan || data.rasioMCKMemadai || data.keberlanjutanEkosistem || data.pemanfaatanAirEfisien) {
+    return 3; // Level 3 - Sanitasi yang Dikelola dengan Aman dan Berkelanjutan
+  }
+  if (data.limbahDikelolaAman || data.adaSeptictank || data.sanitasiBersih) {
+    return 2; // Level 2 - Sanitasi yang Dikelola dengan Aman
+  }
+  if (data.toiletBerfungsi && data.aksesSanitasiMemadai && !data.eksposurLimbah) {
+    return 1; // Level 1 - Sanitasi Dasar
+  }
+  return 0; // Tidak memenuhi syarat
+};
+
+
 
 const tambahDampakService = async (formInputId, data) => {
   const {

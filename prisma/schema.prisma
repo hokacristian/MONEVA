@@ -60,11 +60,36 @@ model Outcome {
   penilaianSaranaAirBersih        String
   penilaianSanitasi               String
   deskripsiAwareness              String
-  bisaDipakaiMCK                  Boolean // Baru
-  bisaDiminum                     Boolean // Baru
-  ecoKeberlanjutan                Boolean // Baru
-  levelSaranaAirBersih            Int     // Baru: Nilai level otomatis
+  bisaDipakaiMCK                  Boolean
+  bisaDiminum                     Boolean
+  ecoKeberlanjutan                Boolean
+  levelSaranaAirBersih            Int     // Level otomatis
+  levelSanitasi                   Int     // Level otomatis untuk sanitasi
   createdAt                       DateTime @default(now())
+
+  // Data tambahan untuk perhitungan levelSaranaAirBersih
+  airHanyaUntukMCK                Boolean
+  aksesTerbatas                   Boolean
+  butuhUsahaJarak                 Boolean
+  airTersediaSetiapSaat           Boolean
+  pengelolaanProfesional          Boolean
+  aksesMudah                      Boolean
+  efisiensiAir                    Boolean
+  ramahLingkungan                 Boolean
+  keadilanAkses                   Boolean
+  adaptabilitasSistem             Boolean
+
+  // Data tambahan untuk perhitungan levelSanitasi
+  toiletBerfungsi                 Boolean
+  aksesSanitasiMemadai            Boolean
+  eksposurLimbah                  Boolean
+  limbahDikelolaAman              Boolean
+  adaSeptictank                   Boolean
+  sanitasiBersih                  Boolean
+  aksesKelompokRentan             Boolean
+  rasioMCKMemadai                 Boolean
+  keberlanjutanEkosistem          Boolean
+  pemanfaatanAirEfisien           Boolean
 
   formInput FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
 }
@@ -88,10 +113,10 @@ model Dampak {
   prosesKonservasiAir               Boolean
   penurunanIndexPencemaranSebelum   Float
   penurunanIndexPencemaranSesudah   Float
-  sumberAirSebelum                  String  // Baru
-  sumberAirSesudah                  String  // Baru
-  biayaListrikSebelum               Float   // Baru
-  biayaListrikSesudah               Float   // Baru
+  sumberAirSebelum                  String  
+  sumberAirSesudah                  String  
+  biayaListrikSebelum               Float   
+  biayaListrikSesudah               Float   
   createdAt                         DateTime @default(now())
 
   formInput FormInput @relation("FormInputToDampak", fields: [formInputId], references: [id])
