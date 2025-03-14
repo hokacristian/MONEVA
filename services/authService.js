@@ -29,12 +29,14 @@ const findUserById = async (id) => {
   return await prisma.user.findUnique({
     where: { id },
     select: {
+      id: true,  // 🔥 Tambahkan ini agar `id` ikut diambil
       name: true,
       email: true,
       role: true,
     },
   });
 };
+
 
 module.exports = {
   registerUser,

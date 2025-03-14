@@ -1,7 +1,6 @@
 const prisma = require("../configs/prisma");
 const { uploadImageToImageKit } = require("../configs/imagekit");
 
-// Di file service
 const tambahFormInputService = async (data, imgUrl, userId) => {
   const jmlhMasyarakat = parseInt(data.jmlhPerempuan) + parseInt(data.jmlhLaki);
 
@@ -10,7 +9,7 @@ const tambahFormInputService = async (data, imgUrl, userId) => {
       lokasi: data.lokasi,
       lat: parseFloat(data.lat),
       long: parseFloat(data.long),
-      img: imgUrl || null, // Handle jika imgUrl undefined
+      img: imgUrl || null, // Jika tidak ada gambar
       jmlhBantuan: parseInt(data.jmlhBantuan),
       jenisBantuan: data.jenisBantuan,
       jmlhKK: parseInt(data.jmlhKK),
@@ -19,14 +18,22 @@ const tambahFormInputService = async (data, imgUrl, userId) => {
       jmlhMasyarakat,
       debitAir: data.debitAir,
       pemakaianAir: data.pemakaianAir,
-      sanitasi: data.sanitasi,
+      sistemPengelolaan: data.sistemPengelolaan, // 🔥 Ganti sanitasi menjadi sistemPengelolaan
       sumberAir: data.sumberAir,
       hargaAir: parseFloat(data.hargaAir),
+
+      // 🔥 Tambahan parameter kualitas air
+      pH: data.pH ? parseFloat(data.pH) : null,
+      TDS: data.TDS ? parseFloat(data.TDS) : null,
+      EC: data.EC ? parseFloat(data.EC) : null,
+      ORP: data.ORP ? parseFloat(data.ORP) : null,
+
       userId,
     },
   });
   return newFormInput;
 };
+
 
 const tambahOutcomeService = async (formInputId, data) => {
   const {
@@ -34,48 +41,58 @@ const tambahOutcomeService = async (formInputId, data) => {
     kualitasAir,
     rataRataTerpaparPenyakitSebelum,
     rataRataTerpaparPenyakitSesudah,
-    awarenessMasyarakat,
-    deskripsiAwareness,
-    penilaianSaranaAirBersih,
-    penilaianSanitasi,
-    bisaDipakaiMCK,
-    bisaDiminum,
-    ecoKeberlanjutan,
+    bisaDipakaiMCK = null, 
+    bisaDiminum = null,
+    ecoKeberlanjutan = null,
 
     // Data tambahan untuk perhitungan level
-    airHanyaUntukMCK,
-    aksesTerbatas,
-    butuhUsahaJarak,
-    airTersediaSetiapSaat,
-    pengelolaanProfesional,
-    aksesMudah,
-    efisiensiAir,
-    ramahLingkungan,
-    keadilanAkses,
-    adaptabilitasSistem,
+    airHanyaUntukMCK = null,
+    aksesTerbatas = null,
+    butuhUsahaJarak = null,
+    airTersediaSetiapSaat = null,
+    pengelolaanProfesional = null,
+    aksesMudah = null,
+    efisiensiAir = null,
+    ramahLingkungan = null,
+    keadilanAkses = null,
+    adaptabilitasSistem = null,
 
-    toiletBerfungsi,
-    aksesSanitasiMemadai,
-    eksposurLimbah,
-    limbahDikelolaAman,
-    adaSeptictank,
-    sanitasiBersih,
-    aksesKelompokRentan,
-    rasioMCKMemadai,
-    keberlanjutanEkosistem,
-    pemanfaatanAirEfisien
+    toiletBerfungsi = null,
+    aksesSanitasiMemadai = null,
+    eksposurLimbah = null,
+    limbahDikelolaAman = null,
+    adaSeptictank = null,
+    sanitasiBersih = null,
+    aksesKelompokRentan = null,
+    rasioMCKMemadai = null,
+    keberlanjutanEkosistem = null,
+    pemanfaatanAirEfisien = null
   } = data;
 
-  // Menentukan levelSaranaAirBersih berdasarkan data
-  const levelSaranaAirBersih = tentukanLevelSaranaAirBersih({
+  // Cek apakah semua nilai terkait `levelSaranaAirBersih` adalah null
+  const isSaranaAirBersihNull = [
+    airHanyaUntukMCK, aksesTerbatas, butuhUsahaJarak,
+    airTersediaSetiapSaat, bisaDiminum, pengelolaanProfesional,
+    aksesMudah, efisiensiAir, ramahLingkungan,
+    keadilanAkses, adaptabilitasSistem
+  ].every(value => value === null || value === undefined);
+
+  // Cek apakah semua nilai terkait `levelSanitasi` adalah null
+  const isSanitasiNull = [
+    toiletBerfungsi, aksesSanitasiMemadai, eksposurLimbah,
+    limbahDikelolaAman, adaSeptictank, sanitasiBersih,
+    aksesKelompokRentan, rasioMCKMemadai, keberlanjutanEkosistem, pemanfaatanAirEfisien
+  ].every(value => value === null || value === undefined);
+
+  // Jika semua field terkait null, set level ke null, jika tidak, hitung ulang
+  const levelSaranaAirBersih = isSaranaAirBersihNull ? null : tentukanLevelSaranaAirBersih({
     airHanyaUntukMCK, aksesTerbatas, butuhUsahaJarak,
     airTersediaSetiapSaat, bisaDiminum, pengelolaanProfesional,
     aksesMudah, efisiensiAir, ramahLingkungan,
     keadilanAkses, adaptabilitasSistem
   });
 
-  // Menentukan levelSanitasi berdasarkan data
-  const levelSanitasi = tentukanLevelSanitasi({
+  const levelSanitasi = isSanitasiNull ? null : tentukanLevelSanitasi({
     toiletBerfungsi, aksesSanitasiMemadai, eksposurLimbah,
     limbahDikelolaAman, adaSeptictank, sanitasiBersih,
     aksesKelompokRentan, rasioMCKMemadai, keberlanjutanEkosistem, pemanfaatanAirEfisien
@@ -97,10 +114,6 @@ const tambahOutcomeService = async (formInputId, data) => {
       kualitasAir,
       rataRataTerpaparPenyakitSebelum: parseInt(rataRataTerpaparPenyakitSebelum),
       rataRataTerpaparPenyakitSesudah: parseInt(rataRataTerpaparPenyakitSesudah),
-      awarenessMasyarakat,
-      deskripsiAwareness,
-      penilaianSaranaAirBersih,
-      penilaianSanitasi,
       bisaDipakaiMCK,
       bisaDiminum,
       ecoKeberlanjutan,
@@ -133,6 +146,7 @@ const tambahOutcomeService = async (formInputId, data) => {
 
   return newOutcome;
 };
+
 
 
 // Fungsi untuk menentukan level sarana air bersih
@@ -318,12 +332,73 @@ const getOutcomeByIdService = async (id) => {
 };
 
 // PATCH (Update) Outcome
+// PATCH (Update) Outcome
 const updateOutcomeService = async (id, data) => {
-  return await prisma.outcome.update({
-    where: { id },
-    data,
-  });
+  try {
+    const existingOutcome = await prisma.outcome.findUnique({
+      where: { id },
+    });
+
+    if (!existingOutcome) {
+      throw new Error("Outcome tidak ditemukan");
+    }
+
+    // Update hanya jika nilai baru dikirim, tetapi tidak menimpa nilai dengan null
+    const updatedData = {
+      ...existingOutcome,
+      ...data,
+    };
+
+    // Cek apakah semua nilai terkait `levelSaranaAirBersih` adalah null
+    const isSaranaAirBersihNull = [
+      updatedData.airHanyaUntukMCK,
+      updatedData.aksesTerbatas,
+      updatedData.butuhUsahaJarak,
+      updatedData.airTersediaSetiapSaat,
+      updatedData.pengelolaanProfesional,
+      updatedData.aksesMudah,
+      updatedData.efisiensiAir,
+      updatedData.ramahLingkungan,
+      updatedData.keadilanAkses,
+      updatedData.adaptabilitasSistem,
+    ].every(value => value === null || value === undefined);
+
+    // Cek apakah semua nilai terkait `levelSanitasi` adalah null
+    const isSanitasiNull = [
+      updatedData.toiletBerfungsi,
+      updatedData.aksesSanitasiMemadai,
+      updatedData.eksposurLimbah,
+      updatedData.limbahDikelolaAman,
+      updatedData.adaSeptictank,
+      updatedData.sanitasiBersih,
+      updatedData.aksesKelompokRentan,
+      updatedData.rasioMCKMemadai,
+      updatedData.keberlanjutanEkosistem,
+      updatedData.pemanfaatanAirEfisien,
+    ].every(value => value === null || value === undefined);
+
+    // Jika semua field terkait null, set level ke null, jika tidak, hitung ulang
+    const levelSaranaAirBersih = isSaranaAirBersihNull ? null : tentukanLevelSaranaAirBersih(updatedData);
+    const levelSanitasi = isSanitasiNull ? null : tentukanLevelSanitasi(updatedData);
+
+    // Update di database
+    const updatedOutcome = await prisma.outcome.update({
+      where: { id },
+      data: {
+        ...data,
+        levelSaranaAirBersih,
+        levelSanitasi,
+      },
+    });
+
+    return updatedOutcome;
+  } catch (error) {
+    console.error("❌ Error saat update outcome:", error.message);
+    throw new Error("Gagal memperbarui outcome: " + error.message);
+  }
 };
+
+
 
 // GET All Dampak
 const getAllDampakService = async () => {

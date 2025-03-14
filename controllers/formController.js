@@ -27,7 +27,6 @@ const tambahFormInput = async (req, res) => {
     const userId = req.user.id;
     let imgUrl = null;
 
-    // ✅ Upload gambar hanya jika ada file yang diunggah
     if (req.file) {
       try {
         imgUrl = await uploadImageToImageKit(req.file);
@@ -38,7 +37,6 @@ const tambahFormInput = async (req, res) => {
       }
     }
 
-    // ✅ Kirim `imgUrl` ke fungsi penyimpanan database
     const newFormInput = await tambahFormInputService(req.body, imgUrl, userId);
 
     res.status(201).json({
@@ -50,6 +48,7 @@ const tambahFormInput = async (req, res) => {
     res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
   }
 };
+
 
 
 

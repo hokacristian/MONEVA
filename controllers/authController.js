@@ -83,14 +83,14 @@ const logout = (req, res) => {
 
 const whoami = async (req, res) => {
   try {
-    // Ambil user ID dari `req.user` (sudah diverifikasi di middleware)
     const user = await findUserById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Kirim data user
+    // 🔥 Pastikan `id` dikembalikan di response
     res.status(200).json({
+      id: user.id,  // ✅ Tambahkan ini
       name: user.name,
       email: user.email,
       role: user.role,
@@ -99,6 +99,7 @@ const whoami = async (req, res) => {
     res.status(500).json({ message: "Error retrieving user data", error: error.message });
   }
 };
+
 
 module.exports = {
   register,

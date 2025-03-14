@@ -24,22 +24,26 @@ model Place {
 }
 
 model FormInput {
-  id             Int      @id @default(autoincrement())
-  lokasi         String
-  lat            Float
-  long           Float
-  img            String?
-  jmlhBantuan    Int
-  jenisBantuan   String
-  jmlhKK         Int
-  jmlhMasyarakat Int
-  jmlhPerempuan  Int
-  jmlhLaki       Int
-  debitAir       String
-  pemakaianAir   String
-  sanitasi       String
-  sumberAir      String    
-  hargaAir       Float     
+  id               Int      @id @default(autoincrement())
+  lokasi          String
+  lat             Float
+  long            Float
+  img             String?
+  jmlhBantuan     Int
+  jenisBantuan    String
+  jmlhKK          Int
+  jmlhMasyarakat  Int
+  jmlhPerempuan   Int
+  jmlhLaki        Int
+  debitAir        String
+  pemakaianAir    String
+  sistemPengelolaan String   
+  sumberAir       String    
+  hargaAir        Float
+  pH             Float?  
+  TDS            Float?  
+  EC             Float?  
+  ORP            Float?  
   createdAt      DateTime  @default(now())
 
   userId Int
@@ -49,6 +53,7 @@ model FormInput {
   dampak  Dampak?  @relation("FormInputToDampak")
 }
 
+
 model Outcome {
   id                              Int      @id @default(autoincrement())
   formInputId                     Int      @unique
@@ -56,43 +61,44 @@ model Outcome {
   kualitasAir                     String
   rataRataTerpaparPenyakitSebelum Int
   rataRataTerpaparPenyakitSesudah Int
-  awarenessMasyarakat             String
-  penilaianSaranaAirBersih        String
-  penilaianSanitasi               String
-  deskripsiAwareness              String
-  bisaDipakaiMCK                  Boolean
-  bisaDiminum                     Boolean
-  ecoKeberlanjutan                Boolean
-  levelSaranaAirBersih            Int     // Level otomatis
-  levelSanitasi                   Int     // Level otomatis untuk sanitasi
+  // awarenessMasyarakat             String
+  // penilaianSaranaAirBersih        String
+  // penilaianSanitasi               String
+  // deskripsiAwareness              String
+  bisaDipakaiMCK                  Boolean?
+  bisaDiminum                     Boolean?
+  ecoKeberlanjutan                Boolean?
+  levelSaranaAirBersih            Int?
+  levelSanitasi                   Int?
   createdAt                       DateTime @default(now())
 
   // Data tambahan untuk perhitungan levelSaranaAirBersih
-  airHanyaUntukMCK                Boolean
-  aksesTerbatas                   Boolean
-  butuhUsahaJarak                 Boolean
-  airTersediaSetiapSaat           Boolean
-  pengelolaanProfesional          Boolean
-  aksesMudah                      Boolean
-  efisiensiAir                    Boolean
-  ramahLingkungan                 Boolean
-  keadilanAkses                   Boolean
-  adaptabilitasSistem             Boolean
+  airHanyaUntukMCK                Boolean?
+  aksesTerbatas                   Boolean?
+  butuhUsahaJarak                 Boolean?
+  airTersediaSetiapSaat           Boolean?
+  pengelolaanProfesional          Boolean?
+  aksesMudah                      Boolean?
+  efisiensiAir                    Boolean?
+  ramahLingkungan                 Boolean?
+  keadilanAkses                   Boolean?
+  adaptabilitasSistem             Boolean?
 
   // Data tambahan untuk perhitungan levelSanitasi
-  toiletBerfungsi                 Boolean
-  aksesSanitasiMemadai            Boolean
-  eksposurLimbah                  Boolean
-  limbahDikelolaAman              Boolean
-  adaSeptictank                   Boolean
-  sanitasiBersih                  Boolean
-  aksesKelompokRentan             Boolean
-  rasioMCKMemadai                 Boolean
-  keberlanjutanEkosistem          Boolean
-  pemanfaatanAirEfisien           Boolean
+  toiletBerfungsi                 Boolean?
+  aksesSanitasiMemadai            Boolean?
+  eksposurLimbah                  Boolean?
+  limbahDikelolaAman              Boolean?
+  adaSeptictank                   Boolean?
+  sanitasiBersih                  Boolean?
+  aksesKelompokRentan             Boolean?
+  rasioMCKMemadai                 Boolean?
+  keberlanjutanEkosistem          Boolean?
+  pemanfaatanAirEfisien           Boolean?
 
   formInput FormInput @relation("FormInputToOutcome", fields: [formInputId], references: [id])
 }
+
 
 model Dampak {
   id                                Int      @id @default(autoincrement())
