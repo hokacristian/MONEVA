@@ -35,11 +35,11 @@ model FormInput {
   jmlhMasyarakat  Int
   jmlhPerempuan   Int
   jmlhLaki        Int
-  debitAir        String
+  debitAir        Int
   pemakaianAir    String
   sistemPengelolaan String   
   sumberAir       String    
-  hargaAir        Float
+  hargaAir        Int
   pH             Float?  
   TDS            Float?  
   EC             Float?  
@@ -58,7 +58,7 @@ model Outcome {
   id                              Int      @id @default(autoincrement())
   formInputId                     Int      @unique
   konsumsiAirPerTahun             Float
-  kualitasAir                     String
+  kualitasAir                     Boolean?
   rataRataTerpaparPenyakitSebelum Int
   rataRataTerpaparPenyakitSesudah Int
   // awarenessMasyarakat             String

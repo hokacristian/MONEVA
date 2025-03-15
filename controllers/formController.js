@@ -93,24 +93,26 @@ const getFormInputById = async (req, res) => {
 };
 
 const updateFormInput = async (req, res) => {
+  console.log("📥 Request Body:", req.body);
+  console.log("📂 Uploaded File:", req.file);
+
   try {
     const updatedFormInput = await updateFormInputService(
       parseInt(req.params.id),
       req.body,
       req.file
     );
-    res
-      .status(200)
-      .json({
-        message: "Form input berhasil diperbarui",
-        data: updatedFormInput,
-      });
+
+    res.status(200).json({
+      message: "✅ Form input berhasil diperbarui",
+      data: updatedFormInput,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Terjadi kesalahan", error: error.message });
+    console.error("❌ Error saat update form input:", error.message);
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
   }
 };
+
 
 const tambahOutcome = async (req, res) => {
   try {

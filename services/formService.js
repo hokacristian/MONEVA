@@ -16,11 +16,11 @@ const tambahFormInputService = async (data, imgUrl, userId) => {
       jmlhPerempuan: parseInt(data.jmlhPerempuan),
       jmlhLaki: parseInt(data.jmlhLaki),
       jmlhMasyarakat,
-      debitAir: data.debitAir,
+      debitAir: parseInt(data.debitAir),
       pemakaianAir: data.pemakaianAir,
       sistemPengelolaan: data.sistemPengelolaan, // 🔥 Ganti sanitasi menjadi sistemPengelolaan
       sumberAir: data.sumberAir,
-      hargaAir: parseFloat(data.hargaAir),
+      hargaAir: parseInt(data.hargaAir),
 
       // 🔥 Tambahan parameter kualitas air
       pH: data.pH ? parseFloat(data.pH) : null,
@@ -38,7 +38,7 @@ const tambahFormInputService = async (data, imgUrl, userId) => {
 const tambahOutcomeService = async (formInputId, data) => {
   const {
     konsumsiAirPerTahun,
-    kualitasAir,
+    kualitasAir=null,
     rataRataTerpaparPenyakitSebelum,
     rataRataTerpaparPenyakitSesudah,
     bisaDipakaiMCK = null, 
@@ -282,24 +282,43 @@ const updateFormInputService = async (id, data, file) => {
     }
   }
 
-  // ✅ Jika ada file, upload ke ImageKit
+  // ✅ Jika ada file baru, unggah ke ImageKit dan dapatkan URL
   if (file) {
-    const uploadImage = await uploadImageToImageKit(file);
-    updatedData.img = uploadImage;
+    try {
+      const uploadImage = await uploadImageToImageKit(file);
+      updatedData.img = uploadImage; // Gunakan URL baru dari ImageKit
+    } catch (error) {
+      throw new Error("Gagal mengunggah gambar ke ImageKit: " + error.message);
+    }
+  } else {
+    // Jika tidak ada file baru, gunakan URL gambar lama
+    updatedData.img = updatedData.img || null;
   }
 
-  // ✅ Konversi angka lain ke format yang benar
-  if (updatedData.jmlhBantuan) updatedData.jmlhBantuan = parseInt(updatedData.jmlhBantuan);
-  if (updatedData.jmlhKK) updatedData.jmlhKK = parseInt(updatedData.jmlhKK);
-  if (updatedData.jmlhPerempuan) updatedData.jmlhPerempuan = parseInt(updatedData.jmlhPerempuan);
-  if (updatedData.jmlhLaki) updatedData.jmlhLaki = parseInt(updatedData.jmlhLaki);
-  if (updatedData.lat) updatedData.lat = parseFloat(updatedData.lat);
-  if (updatedData.long) updatedData.long = parseFloat(updatedData.long);
+  // ✅ Konversi semua data numerik ke tipe data yang benar
+  updatedData.lat = updatedData.lat ? parseFloat(updatedData.lat) : null;
+  updatedData.long = updatedData.long ? parseFloat(updatedData.long) : null;
+  updatedData.jmlhBantuan = updatedData.jmlhBantuan ? parseInt(updatedData.jmlhBantuan) : null;
+  updatedData.jenisBantuan = updatedData.jenisBantuan || null;
+  updatedData.jmlhKK = updatedData.jmlhKK ? parseInt(updatedData.jmlhKK) : null;
+  updatedData.jmlhPerempuan = updatedData.jmlhPerempuan ? parseInt(updatedData.jmlhPerempuan) : null;
+  updatedData.jmlhLaki = updatedData.jmlhLaki ? parseInt(updatedData.jmlhLaki) : null;
+  updatedData.debitAir = updatedData.debitAir ? parseInt(updatedData.debitAir) : null;
+  updatedData.pH = updatedData.pH ? parseFloat(updatedData.pH) : null;
+  updatedData.TDS = updatedData.TDS ? parseFloat(updatedData.TDS) : null;
+  updatedData.EC = updatedData.EC ? parseFloat(updatedData.EC) : null;
+  updatedData.ORP = updatedData.ORP ? parseFloat(updatedData.ORP) : null;
+  updatedData.hargaAir = updatedData.hargaAir ? parseInt(updatedData.hargaAir) : null;
 
-  // ✅ Hitung ulang jumlah masyarakat
-  if (updatedData.jmlhPerempuan !== undefined && updatedData.jmlhLaki !== undefined) {
+  // ✅ Hitung ulang jumlah masyarakat jika data ada
+  if (updatedData.jmlhPerempuan !== null && updatedData.jmlhLaki !== null) {
     updatedData.jmlhMasyarakat = updatedData.jmlhPerempuan + updatedData.jmlhLaki;
   }
+
+  // ✅ Pastikan data string tetap ada
+  updatedData.pemakaianAir = updatedData.pemakaianAir || null;
+  updatedData.sistemPengelolaan = updatedData.sistemPengelolaan || null;
+  updatedData.sumberAir = updatedData.sumberAir || null;
 
   try {
     const updatedFormInput = await prisma.formInput.update({
@@ -314,6 +333,8 @@ const updateFormInputService = async (id, data, file) => {
     throw new Error("Gagal memperbarui data: " + error.message);
   }
 };
+
+
 
 
 // GET All Outcomes
