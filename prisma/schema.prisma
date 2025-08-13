@@ -25,21 +25,21 @@ model Place {
 
 model FormInput {
   id               Int      @id @default(autoincrement())
-  lokasi          String
-  lat             Float
-  long            Float
+  lokasi          String ?
+  lat             Float ?
+  long            Float ?
   img             String?
-  jmlhBantuan     Int
-  jenisBantuan    String
-  jmlhKK          Int
-  jmlhMasyarakat  Int
-  jmlhPerempuan   Int
-  jmlhLaki        Int
-  debitAir        Int
-  pemakaianAir    String
-  sistemPengelolaan String   
-  sumberAir       String    
-  hargaAir        Int
+  jmlhBantuan     Int ?
+  jenisBantuan    String ?
+  jmlhKK          Int ?
+  jmlhMasyarakat  Int ?
+  jmlhPerempuan   Int ?
+  jmlhLaki        Int ?
+  debitAir        Int ?
+  pemakaianAir    String ?
+  sistemPengelolaan String ?  
+  sumberAir       String ?     
+  hargaAir        Int ?
   pH             Float?  
   TDS            Float?  
   EC             Float?  
@@ -57,10 +57,10 @@ model FormInput {
 model Outcome {
   id                              Int      @id @default(autoincrement())
   formInputId                     Int      @unique
-  konsumsiAirPerTahun             Float
+  konsumsiAirPerTahun             Float ?
   kualitasAir                     Boolean?
-  rataRataTerpaparPenyakitSebelum Int
-  rataRataTerpaparPenyakitSesudah Int
+  rataRataTerpaparPenyakitSebelum Int ?
+  rataRataTerpaparPenyakitSesudah Int ?
   // awarenessMasyarakat             String
   // penilaianSaranaAirBersih        String
   // penilaianSanitasi               String
@@ -103,26 +103,26 @@ model Outcome {
 model Dampak {
   id                                Int      @id @default(autoincrement())
   formInputId                       Int      @unique
-  biayaBerobatSebelum               Float
-  biayaBerobatSesudah               Float
-  biayaAirBersihSebelum             Float
-  biayaAirBersihSesudah             Float
-  peningkatanEkonomiSebelum         Float
-  peningkatanEkonomiSesudah         Float
-  penurunanOrangSakitSebelum        Int
-  penurunanOrangSakitSesudah        Int
-  penurunanStuntingSebelum          Int
-  penurunanStuntingSesudah          Int
-  peningkatanIndeksKesehatanSebelum Float
-  peningkatanIndeksKesehatanSesudah Float
-  volumeLimbahDikelola              Float
+  biayaBerobatSebelum               Float ?
+  biayaBerobatSesudah               Float ?
+  biayaAirBersihSebelum             Float ?
+  biayaAirBersihSesudah             Float ?
+  peningkatanEkonomiSebelum         Float ?
+  peningkatanEkonomiSesudah         Float ?
+  penurunanOrangSakitSebelum        String ?
+  penurunanOrangSakitSesudah        String ?
+  penurunanStuntingSebelum          Int ?
+  penurunanStuntingSesudah          Int ?
+  peningkatanIndeksKesehatanSebelum Float ?
+  peningkatanIndeksKesehatanSesudah Float ?
+  volumeLimbahDikelola              Float ?
   prosesKonservasiAir               Boolean
-  penurunanIndexPencemaranSebelum   Float
-  penurunanIndexPencemaranSesudah   Float
-  sumberAirSebelum                  String  
-  sumberAirSesudah                  String  
-  biayaListrikSebelum               Float   
-  biayaListrikSesudah               Float   
+  penurunanIndexPencemaranSebelum   Float?
+  penurunanIndexPencemaranSesudah   Float?
+  sumberAirSebelum                  String  ?
+  sumberAirSesudah                  String  ?
+  biayaListrikSebelum               Float   ?
+  biayaListrikSesudah               Float   ?
   createdAt                         DateTime @default(now())
 
   formInput FormInput @relation("FormInputToDampak", fields: [formInputId], references: [id])

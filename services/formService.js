@@ -2,37 +2,33 @@ const prisma = require("../configs/prisma");
 const { uploadImageToImageKit } = require("../configs/imagekit");
 
 const tambahFormInputService = async (data, imgUrl, userId) => {
-  const jmlhMasyarakat = parseInt(data.jmlhPerempuan) + parseInt(data.jmlhLaki);
-
   const newFormInput = await prisma.formInput.create({
     data: {
       lokasi: data.lokasi,
-      lat: parseFloat(data.lat),
-      long: parseFloat(data.long),
-      img: imgUrl || null, // Jika tidak ada gambar
-      jmlhBantuan: parseInt(data.jmlhBantuan),
-      jenisBantuan: data.jenisBantuan,
-      jmlhKK: parseInt(data.jmlhKK),
-      jmlhPerempuan: parseInt(data.jmlhPerempuan),
-      jmlhLaki: parseInt(data.jmlhLaki),
-      jmlhMasyarakat,
-      debitAir: parseInt(data.debitAir),
-      pemakaianAir: data.pemakaianAir,
-      sistemPengelolaan: data.sistemPengelolaan, // 🔥 Ganti sanitasi menjadi sistemPengelolaan
-      sumberAir: data.sumberAir,
-      hargaAir: parseInt(data.hargaAir),
-
-      // 🔥 Tambahan parameter kualitas air
+      lat: data.lat ? parseFloat(data.lat) : null,
+      long: data.long ? parseFloat(data.long) : null,
+      img: imgUrl || null,
+      jmlhBantuan: data.jmlhBantuan ? parseInt(data.jmlhBantuan) : null,
+      jenisBantuan: data.jenisBantuan || null,
+      jmlhKK: data.jmlhKK ? parseInt(data.jmlhKK) : null,
+      jmlhPerempuan: data.jmlhPerempuan ? parseInt(data.jmlhPerempuan) : null,
+      jmlhLaki: data.jmlhLaki ? parseInt(data.jmlhLaki) : null,
+      jmlhMasyarakat: data.jmlhPerempuan && data.jmlhLaki ? parseInt(data.jmlhPerempuan) + parseInt(data.jmlhLaki) : null,
+      debitAir: data.debitAir ? parseInt(data.debitAir) : null,
+      pemakaianAir: data.pemakaianAir || null,
+      sistemPengelolaan: data.sistemPengelolaan || null,
+      sumberAir: data.sumberAir || null,
+      hargaAir: data.hargaAir ? parseInt(data.hargaAir) : null,
       pH: data.pH ? parseFloat(data.pH) : null,
       TDS: data.TDS ? parseFloat(data.TDS) : null,
       EC: data.EC ? parseFloat(data.EC) : null,
       ORP: data.ORP ? parseFloat(data.ORP) : null,
-
       userId,
     },
   });
   return newFormInput;
 };
+
 
 
 const tambahOutcomeService = async (formInputId, data) => {
@@ -44,8 +40,6 @@ const tambahOutcomeService = async (formInputId, data) => {
     bisaDipakaiMCK = null, 
     bisaDiminum = null,
     ecoKeberlanjutan = null,
-
-    // Data tambahan untuk perhitungan level
     airHanyaUntukMCK = null,
     aksesTerbatas = null,
     butuhUsahaJarak = null,
